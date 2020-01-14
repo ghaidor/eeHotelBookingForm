@@ -6,7 +6,7 @@ The browser tests are meant to be run against a fully deployed instance of Hotel
 executed to hit a browser (of choice) and automate some of the more common operations that will mimic how a user 
 may actually use the system. More involved tests can be added without much rework due to the framework design.
 
-##Test Execution - First Run
+## Test Execution - First Run
 
 1. Download/clone project from github
 2. Open project with IDE > Import Maven project
