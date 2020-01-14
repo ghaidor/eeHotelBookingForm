@@ -6,17 +6,20 @@ The browser tests are meant to be run against a fully deployed instance of Hotel
 executed to hit a browser (of choice) and automate some of the more common operations that will mimic how a user 
 may actually use the system. More involved tests can be added without much rework due to the framework design.
 
-##Test Execution
+##Test Execution - First Run
 
-When executing the tests the webdrivermanager will check for the drivers and install the appropriate drivers according to the browser chosen and OS.
-The automated tests can be run in any IDE although intelliJ is preferred for minimum 
-set-up as the Junit runner is automatically configured for execution.
+1. Download/clone project from github
+2. Open project with IDE > Import Maven project
+3. Configure project with SDK
+4. Run 'AddHotelBookingTest' or setup run config for Junit tests
+5. Set environment variable in runner => name=browser; value=chrome
+
+When executing the tests the webdrivermanager will check for the drivers and install the appropriate drivers according to the browser chosen and OS. 
 
 ### Running tests in Chrome/FireFox
 
 The tests can be run either in Chrome (chromedriver) or Firefox (geckodriver) which can be specified in the
 run configuration with [browser] env variable set to either "chrome" or "firefox". 
-IntelliJ default run config is set to chrome.
 
 
 ## General Design Principles
