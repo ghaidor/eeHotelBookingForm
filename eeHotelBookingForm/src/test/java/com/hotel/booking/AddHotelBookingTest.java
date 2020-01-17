@@ -19,7 +19,7 @@ public class AddHotelBookingTest  {
 
     @Before
     public void goToHotelBookingPage() {
-        booking.goTo();
+        booking.goToBookingForm();
         Assert.assertTrue(booking.isAt());
     }
 
