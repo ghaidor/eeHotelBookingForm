@@ -40,7 +40,7 @@ public final class HotelBookingFormPage extends BasePage {
     private static final String getCheckoutDate = "//div[@id='%s']/div[@class='col-md-2'][5]";
     private static final String deleteButton = "//div[@id='%s']/div[@class='col-md-1'][2]/input";
 
-    public void goToBookingForm() {
+    public void goTo() {
         goTo(URL);
         waitForPageToLoad();
     }
