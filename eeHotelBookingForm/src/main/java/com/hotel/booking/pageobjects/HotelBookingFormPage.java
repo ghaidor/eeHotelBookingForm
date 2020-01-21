@@ -4,10 +4,12 @@ import lombok.Getter;
 import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.time.LocalDate;
-import java.time.Month;
+import java.util.Collections;
+import java.util.List;
 
 import static org.openqa.selenium.By.*;
 
@@ -20,25 +22,28 @@ public final class HotelBookingFormPage extends BasePage {
 
     private static final String URL = "http://hotel-test.equalexperts.io/";
 
-    private final By firstName = id("firstname");
-    private final By lastName = id("lastname");
-    private final By price = id("totalprice");
-    private final By deposit = id("depositpaid");
-    private final By checkInField = id("checkin");
-    private final By checkOutField = id("checkout");
-    private final By nextMonthCI = cssSelector(".ui-datepicker-next");
-    private final By nextMonthCO = cssSelector(".ui-icon-circle-triangle-e");
-    private final By monthName = xpath("//span[@class='ui-datepicker-month']");
-    private final By yearValue = xpath("//span[@class='ui-datepicker-year']");
-    private final By saveBooking = cssSelector("input[value=' Save ']");
+    private final By FIRST_NAME = id("firstname");
+    private final By LAST_NAME = id("lastname");
+    private final By PRICE = id("totalprice");
+    private final By DEPOSIT = id("depositpaid");
+    private final By CHECK_IN = id("checkin");
+    private final By CHECK_OUT = id("checkout");
+    private final By NEXT_MONTH_CI = cssSelector(".ui-datepicker-next");
+    private final By NEXT_MONTH_CO = cssSelector(".ui-icon-circle-triangle-e");
+    private final By MONTH_NAME = xpath("//span[@class='ui-datepicker-month']");
+    private final By YEAR = xpath("//span[@class='ui-datepicker-year']");
+    private final By SAVE_BOOKING = cssSelector("input[value=' Save ']");
 
-    private static final String getFirstName = "//div[@id='%s']/div[@class='col-md-2']";
-    private static final String getLastName = "//div[@id='%s']/div[@class='col-md-2'][2]";
-    private static final String getPrice = "//div[@id='%s']/div[@class='col-md-1']";
-    private static final String getDepositPaid = "//div[@id='%s']/div[@class='col-md-2'][3]";
-    private static final String getCheckinDate = "//div[@id='%s']/div[@class='col-md-2'][4]";
-    private static final String getCheckoutDate = "//div[@id='%s']/div[@class='col-md-2'][5]";
-    private static final String deleteButton = "//div[@id='%s']/div[@class='col-md-1'][2]/input";
+    private static final String GET_FIRST_NAME = "//div[@id='%s']/div[@class='col-md-2']";
+    private static final String GET_LAST_NAME = "//div[@id='%s']/div[@class='col-md-2'][2]";
+    private static final String GET_PRICE = "//div[@id='%s']/div[@class='col-md-1']";
+    private static final String GET_DEPOSIT_PAID = "//div[@id='%s']/div[@class='col-md-2'][3]";
+    private static final String GET_CHECKIN_DATE = "//div[@id='%s']/div[@class='col-md-2'][4]";
+    private static final String GET_CHECKOUT_DATE = "//div[@id='%s']/div[@class='col-md-2'][5]";
+    private static final String DELETE_BUTTON = "//div[@id='%s']/div[@class='col-md-1'][2]/input";
+
+    private static final String TO_DELETE_BOOKING_ID = "//div[@id='%s']";
+    private static final String DELETE_BUTTON_PATH = "//*[@id='%s']/div[7]/input";
 
     public void goTo() {
         goTo(URL);
@@ -50,102 +55,99 @@ public final class HotelBookingFormPage extends BasePage {
     }
 
     public String getFirstName(String newId) {
-        WebElement element = getDriver().findElement(By.xpath(String.format(getFirstName, newId)));
-        return element.getText();
+        return ele(GET_FIRST_NAME, newId);
     }
 
     public String getLastName(String newId) {
-        WebElement element = getDriver().findElement(By.xpath(String.format(getLastName, newId)));
-        return element.getText();
+        return ele(GET_LAST_NAME, newId);
     }
 
     public double getPrice(String newId) {
-        WebElement element = getDriver().findElement(By.xpath(String.format(getPrice, newId)));
-        return Double.parseDouble(element.getText());
+        return Double.parseDouble(ele(GET_PRICE, newId));
     }
 
     public String getDepositPaid(String newId) {
-        WebElement element = getDriver().findElement(By.xpath(String.format(getDepositPaid, newId)));
-        return element.getText();
+        return ele(GET_DEPOSIT_PAID, newId);
     }
 
     public String getCheckinDate(String newId) {
-        WebElement element = getDriver().findElement(By.xpath(String.format(getCheckinDate, newId)));
-        return element.getText();
+        return ele(GET_CHECKIN_DATE, newId);
     }
 
     public String getCheckoutDate(String newId) {
-        WebElement element = getDriver().findElement(By.xpath(String.format(getCheckoutDate, newId)));
-        return element.getText();
+        return ele(GET_CHECKOUT_DATE, newId);
     }
 
     public String deleteButton(String newId) {
-        WebElement element = getDriver().findElement(By.xpath(String.format(deleteButton, newId)));
+        WebElement element = getDriver().findElement(By.xpath(String.format(DELETE_BUTTON, newId)));
         Assert.assertTrue("Delete button is disabled for booking ID no: " + newId, element.isEnabled());
         return element.getAttribute("value");
     }
 
     public HotelBookingFormPage fillInFirstName(String value) {
-        fillInTextField(firstName, value);
+        fillInTextField(FIRST_NAME, value);
         return this;
     }
 
     public HotelBookingFormPage fillInLastName(String value) {
-        fillInTextField(lastName, value);
+        fillInTextField(LAST_NAME, value);
         return this;
     }
 
     public HotelBookingFormPage fillInPrice(double value) {
-        fillInNumericField(price, value);
+        fillInNumericField(PRICE, value);
         return this;
     }
 
     public HotelBookingFormPage depositPaid(String value) {
-        Select selectDeposit = new Select(getDriver().findElement(deposit));
+        Select selectDeposit = new Select(getDriver().findElement(DEPOSIT));
         selectDeposit.selectByVisibleText(value);
         return this;
     }
 
     public HotelBookingFormPage selectCheckInDate(String day) {
-        WebElement e = getDriver().findElement(checkInField);
-        e.click();
-        WebElement month = getDriver().findElement(nextMonthCI);
-        month.click();
-        String selectedMonth = getDriver().findElement(monthName).getText();
-        String selectedYear = getDriver().findElement(yearValue).getText();
-        LocalDate date = LocalDate.of(Integer.parseInt(selectedYear), Month.valueOf(selectedMonth.toUpperCase()), Integer.parseInt(day));
-        selectedDateCI = date.toString();
-
-        getDriver().findElement(By.linkText(day)).click();
+        clickElement(CHECK_IN);
+        clickElement(NEXT_MONTH_CI);
+        selectedDateCI = dateBuilder(MONTH_NAME, YEAR, day);
+        clickElement(By.linkText(day));
         return this;
     }
 
     public HotelBookingFormPage selectCheckOutDate(String day) {
-        WebElement e = getDriver().findElement(checkOutField);
-        e.click();
-        WebElement month = getDriver().findElement(nextMonthCO);
-        month.click();
-        String selectedMonth = getDriver().findElement(monthName).getText();
-        String selectedYear = getDriver().findElement(yearValue).getText();
-        LocalDate date = LocalDate.of(Integer.parseInt(selectedYear), Month.valueOf(selectedMonth.toUpperCase()), Integer.parseInt(day));
-        selectedDateCO = date.toString();
-
-        getDriver().findElement(By.linkText(day)).click();
+        clickElement(CHECK_OUT);
+        clickElement(NEXT_MONTH_CO);
+        selectedDateCO = dateBuilder(MONTH_NAME, YEAR, day);
+        clickElement(By.linkText(day));
         return this;
     }
 
     public HotelBookingFormPage enterCheckinDate(String checkinDateEntered) {
-        fillInDateField(checkInField, checkinDateEntered);
+        fillInDateField(CHECK_IN, checkinDateEntered);
         return this;
     }
 
     public void enterCheckoutDate(String checkoutDateEntered) {
-        fillInDateField(checkOutField, checkoutDateEntered);
+        fillInDateField(CHECK_OUT, checkoutDateEntered);
     }
 
     public void saveBooking() {
-        WebElement e = getDriver().findElement(saveBooking);
+        WebElement e = getDriver().findElement(SAVE_BOOKING);
         e.click();
+    }
+
+    public int deleteBooking(final int rowsCountAfter, String newId, int timeout) {
+        WebElement deleteBooking = getDriver().findElement(By.xpath(String.format(TO_DELETE_BOOKING_ID, newId)));
+        List<String> bookingDetails = Collections.singletonList(deleteBooking.getText());
+        LOG.info("Booking ID " + newId + " will be DELETED and contains the following details: \n" + bookingDetails.toString().replaceAll("\\r\\n|\\r|\\n", " "));
+
+        WebElement deleteButton = getDriver().findElement(By.xpath(String.format(DELETE_BUTTON_PATH, newId)));
+        deleteButton.click();
+        WebDriverWait wait = new WebDriverWait(getDriver(), timeout);
+        wait.until(ExpectedConditions.invisibilityOf(deleteBooking));
+
+        LOG.info("Count of hotel bookings AFTER deletion: " + rowsCountAfterAction());
+        LOG.info("Booking ID " + newId + " has been DELETED");
+        return rowsCountAfter;
     }
 
 }
