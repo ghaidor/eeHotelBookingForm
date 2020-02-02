@@ -1,11 +1,8 @@
 package com.hotel.booking.pageobjects;
 
-import static org.openqa.selenium.By.xpath;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
+import com.github.underscore.lodash.U;
+import com.hotel.booking.factory.FactoryDriver;
+import lombok.Getter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
@@ -13,25 +10,20 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import com.github.underscore.lodash.U;
-import com.hotel.booking.factory.FactoryDriver;
+import java.time.LocalDate;
+import java.time.Month;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-import lombok.Getter;
+import static org.openqa.selenium.By.xpath;
 
 
 public class BasePage {
 
-    private static final Logger LOG = LogManager.getLogger(BasePage.class);
-
-    private static final String toDeleteBookingId = "//div[@id='%s']";
-    private static final String deleteButtonPath = "//*[@id='%s']/div[7]/input";
-    private final By rowsAfter = xpath("//div[@class='row'][@id]");
-    private final By rowsBefore = xpath("//div[@class='row'][@id]");
-
-    protected WebDriver driver;
+    protected static final Logger LOG = LogManager.getLogger(BasePage.class);
 
     @Getter
     private int rowsCountBefore;
@@ -41,6 +33,11 @@ public class BasePage {
     private String rowIdsBefore;
     @Getter
     private String rowIdsAfter;
+
+    private final By rowsAfter = xpath("//div[@class='row'][@id]");
+    private final By rowsBefore = xpath("//div[@class='row'][@id]");
+
+    protected WebDriver driver;
 
     public BasePage() {
         driver = FactoryDriver.getWebDriverContext();
@@ -93,13 +90,13 @@ public class BasePage {
         return rowsCountBefore;
     }
 
-    public int rowsCountAfterAction(){
+    public int rowsCountAfterAction() {
         WebElement baseTable = getDriver().findElement(By.id("bookings"));
         rowsCountAfter = baseTable.findElements(rowsAfter).size();
         return rowsCountAfter;
     }
 
-    public String rowIdsBefore(){
+    public String rowIdsBefore() {
         WebElement baseTable = getDriver().findElement(By.id("bookings"));
         List<WebElement> tableRows = baseTable.findElements(By.cssSelector(".row"));
         if (tableRows.size() == 0) {
@@ -113,11 +110,11 @@ public class BasePage {
         return rowIdsBefore;
     }
 
-    public String rowIdsAfter(){
+    public String rowIdsAfter() {
         waitForPageToLoad();
         WebElement baseTable = getDriver().findElement(By.id("bookings"));
         List<WebElement> tableRows = baseTable.findElements(By.cssSelector(".row"));
-        for(int i = 1; i <tableRows.size() ; ++i) {
+        for (int i = 1; i < tableRows.size(); ++i) {
             rowIdsAfter = tableRows.get(i).getAttribute("id");
             LOG.info("After booking/deletion - Booking ID for row {}: {}", i, rowIdsAfter);
         }
@@ -131,7 +128,7 @@ public class BasePage {
         return rowsCountAfter;
     }
 
-    public String rowIdComparison(String rowIdsBeforeSet, String rowIdsAfterSet){
+    public String rowIdComparison(String rowIdsBeforeSet, String rowIdsAfterSet) {
         List<String> beforeIds = Collections.singletonList(rowIdsBeforeSet);
         List<String> afterIds = Collections.singletonList(rowIdsAfterSet);
         String newId = U.difference(afterIds, beforeIds).toString().replaceAll("[\\[\\]]", "");
@@ -139,25 +136,29 @@ public class BasePage {
         return newId;
     }
 
-    public int deleteBooking(final int rowsCountAfter, String newId, int timeout) {
-        WebElement deleteBooking = getDriver().findElement(By.xpath(String.format(toDeleteBookingId, newId)));
-        List<String> bookingDetails = Collections.singletonList(deleteBooking.getText());
-        LOG.info("Booking ID " + newId + " will be DELETED and contains the following details: \n" + bookingDetails.toString().replaceAll("\\r\\n|\\r|\\n", " "));
-
-        WebElement deleteButton = getDriver().findElement(By.xpath(String.format(deleteButtonPath, newId)));
-        deleteButton.click();
-        WebDriverWait wait = new WebDriverWait(getDriver(), timeout);
-        wait.until(ExpectedConditions.invisibilityOf(deleteBooking));
-
-        LOG.info("Count of hotel bookings AFTER deletion: " + rowsCountAfterAction());
-        LOG.info("Booking ID " + newId + " has been DELETED");
-        return rowsCountAfter;
+    protected WebDriver getDriver() {
+        return driver;
     }
 
-    protected WebDriver getDriver() { return driver; }
-
-    protected String driverTitle(){
+    protected String driverTitle() {
         return driver.getTitle();
+    }
+
+    protected String ele(String getElement, String newId) {
+        WebElement element = getDriver().findElement(By.xpath(String.format(getElement, newId)));
+        return element.getText();
+    }
+
+    protected void clickElement(By ele) {
+        WebElement element = getDriver().findElement(ele);
+        element.click();
+    }
+
+    protected String dateBuilder(By month, By year, String day) {
+        String selectedMonth = getDriver().findElement(month).getText();
+        String selectedYear = getDriver().findElement(year).getText();
+        LocalDate date = LocalDate.of(Integer.parseInt(selectedYear), Month.valueOf(selectedMonth.toUpperCase()), Integer.parseInt(day));
+        return date.toString();
     }
 
 }
